@@ -59,9 +59,9 @@ ISR(TIMER4_CAPT_vect){
 ISR(TIMER5_CAPT_vect){
 	
 	//convert float to char array
-	timeDelay = ICR5*0.0005;
+	timeDelay = ICR5*0.0000005;
 	
-	x = timeDelay *1000 / (345000/2);
+	x = timeDelay *1000 * (345/2);
 	tenthou = x / 10000;
 	thou = (x % 10000) / 1000;
 	hunds = (x % 1000) / 100;
