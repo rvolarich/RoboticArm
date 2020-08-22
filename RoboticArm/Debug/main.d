@@ -1,6 +1,4 @@
 main.d main.o: .././main.cpp \
- m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h \
- m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
  m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h \
  m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\sfr_defs.h \
  m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\inttypes.h \
@@ -15,14 +13,7 @@ main.d main.o: .././main.cpp \
  m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay.h \
  m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
  m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h \
- m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
- m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdio.h \
- m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdarg.h \
- m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\string.h
-
-m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h:
-
-m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h:
+ m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h
 
 m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -53,9 +44,3 @@ m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay
 m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h:
 
 m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h:
-
-m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdio.h:
-
-m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdarg.h:
-
-m:\atmel\ studio\ 7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\string.h:

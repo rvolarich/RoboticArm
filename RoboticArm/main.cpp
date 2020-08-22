@@ -11,13 +11,13 @@
 
 
 
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <avr/io.h>
 #include <avr/sfr_defs.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
-#include <stdio.h>
-#include <string.h>
+//#include <stdio.h>
+//#include <string.h>
 
 
 
@@ -30,6 +30,7 @@ void USART_Transmit(unsigned char data);
 void timer_init(void);
 void start_timer(int timer, int prescaler);
 void USART_putstring(char* StringPtr);
+void sonarTrigger(void);
 //void USART_sendInt(int a);
 //void gcvt(float f, int ndigits, char * buf);
 
@@ -46,6 +47,11 @@ int thou;
 int hunds;
 int tents;
 int ones;
+int ICR_first_value;
+int ICR_last_value;
+bool _ICR_first_value = true;
+bool _ICR_last_value = false;
+int finalPosition;
 
 // INTERRUPTS
 
@@ -53,14 +59,34 @@ ISR(TIMER4_CAPT_vect){
 	
 	
 	TCCR5B |= 1 << CS51;
-	//PORTB = 0x00;
+	//PORTB = 0xff;
+	
 }
 
 ISR(TIMER5_CAPT_vect){
 	
 	//convert float to char array
-	timeDelay = ICR5*0.0000005;
+	//timeDelay = ICR5*0.0000005;
+	//timeDelay = ICR5;
+	x = ICR5;
+	tenthou = x / 10000;
+	thou = (x % 10000) / 1000;
+	hunds = (x % 1000) / 100;
+	tents = (x % 100) / 10;
+	ones = (x % 100) % 10;
 	
+	distance[0]= tenthou + 48;
+	distance[1]= thou + 48;
+	
+	distance[2]= hunds + 48;
+	distance[3]= tents + 48;
+	distance[4]= ones + 48;
+	
+	distance[5]= 0x00;
+	
+	//convert float to char array
+	//timeDelay = ICR5*0.0000005;
+	/*timeDelay = ICR5;
 	x = timeDelay *1000 * (345/2);
 	tenthou = x / 10000;
 	thou = (x % 10000) / 1000;
@@ -75,12 +101,11 @@ ISR(TIMER5_CAPT_vect){
 	distance[4]= tents + 48;
 	distance[5]= ones + 48;
 	distance[6]= 'm';
-	distance[7]= 0x00;
+	distance[7]= 0x00;*/
 	
-	USART_putstring(String);
-	USART_putstring(distance);
 	
-	//PORTB = 0xff;
+	
+	//PORTB = 0x00;
 	TCCR5B &= ~(1 << CS51);
 	TCNT5 = 0x00;
 }
@@ -132,11 +157,21 @@ void USART_Transmit(unsigned char data){
 	
 }*/
 
+void sonarTrigger(){
+	
+	start_timer(0, 256);
+	while(TCNT0 < 1)			// delay 12micro
+	{
+		PORTL |= 1 << 6;	// start trigger
+	}
+	PORTL &=~(1 << 6);		// shut trigger
+}
+
 void timer_init(){
 	
 	TCCR1A |= 1 << WGM11 | 1 << COM1A1;
 	TCCR1B |= 1 << WGM13 | 1 << WGM12 | 1 << CS11; 
-	ICR1 = 15999;
+	ICR1 = 6700;
 	OCR1A = 3080;
 }
 
@@ -185,6 +220,8 @@ int main(void)
 	//PORTL = 0x00;
 	MCUCR &=~ (1 << PUD);
 	USART_Init(UBR_9600);
+	TCCR3B |= (1 << CS32) | (1 << CS30);
+	TCNT3 = 0;
 	
 	//set PJ1 as input
 	DDRJ &=~(1 << PJ1);
@@ -214,6 +251,9 @@ int main(void)
 	strncpy(tab2, to_string(123.45).strcat(), sizeof(tab2));
 	tab2[sizeof(tab2) - 1] = 0;*/
 	
+	ICR_first_value = 0;
+	ICR_last_value = 0;
+	
 	
 	while (1)
 	{
@@ -222,8 +262,14 @@ int main(void)
 		PORTB = 0x00;
 		_delay_ms(500);*/
 		
+		sonarTrigger();
 		
-		
+		//_delay_ms(1000);
+		if(TCNT3 > 15000){
+		//USART_putstring(String);
+		//USART_putstring(distance);
+		TCNT3 = 0;
+		}
 		    //Pass the string to the USART_putstring function and sends it over the serial
 		//_delay_ms(5000);
 		/*if(!(UCSR2A & (1 << UDRE2))){
@@ -236,15 +282,17 @@ int main(void)
 		//OCR1A = 5100;
 		
 		
+		
 		if(!(PINL & (1 << PINL7))) startServo = true;
 			
 			
 		if(startServo){
 			
 			OCR1A = 1240;
-			_delay_ms(200);
-			
-		for(int i = OCR1A; i < 5101; i++){
+			sonarTrigger();
+			_delay_ms(500);
+			//PORTB = 0xFF;
+		for(int i = OCR1A; i < 5101; i+=7){
 			
 			if(!(PINL & (1 << PINL5))){
 				
@@ -254,21 +302,77 @@ int main(void)
 			}
 			
 			
+			sonarTrigger();
+			_delay_ms(5);
+			
+			
+			
+			if(ICR5 < 3600){
+				//PORTB = 0x00;
+				//break;
+				
+				/*ICR_current_value = ICR5;
+				
+				if((ICR_last_value - ICR_current_value) < -120){
+					
+					break;
+				}
+				
+				
+				ICR_last_value = ICR_current_value;*/
+				_delay_ms(20);
+				_ICR_last_value = true;
+				
+				if(_ICR_first_value){
+					
+				ICR_first_value = OCR1A;
+				_ICR_first_value = false;
+				
+				}
+			}
+			else {
+				
+				if(_ICR_last_value){
+					
+					ICR_last_value = OCR1A;
+					while(1){
+						
+						OCR1A = ((ICR_last_value - ICR_first_value) / 2) + ICR_first_value;
+						if(!(PINL & (1 << PINL5))){
+							
+							//PORTB = 0x00;
+							
+							OCR1A = 3080;
+							startServo = false;
+							break;
+							
+						}
+					}
+					_ICR_last_value = false;
+					
+					
+				}
+				
+				_ICR_first_value = true;
+			}
+			
+			
 			
 			OCR1A = i;
 			
-			_delay_us(60);
+			
 			
 		
 			
-		}
-		
 		}
 		startServo = false;
 		
-		/*_delay_ms(50);
+		}
 		
-		for(int i = OCR1A; i > 3079; i--){
+		
+		//_delay_ms(50);
+		
+		/*for(int i = OCR1A; i > 3079; i--){
 			
 			if(!(PINL & (1 << PINL5))){
 				
@@ -297,10 +401,11 @@ int main(void)
 		
 		if(!(PINL & (1 << PINL5))){
 			
-			PORTB = 0x00;
+			//PORTB = 0x00;
 		
 		OCR1A = 3080;
 		startServo = false;
+		
 		
 		}
 		/*TCCR0B |= 1 << CS00;*/
@@ -311,12 +416,7 @@ int main(void)
 		/*PORTL |= 1 << 6;*/			// fire trigger
 		
 		
-		start_timer(0, 256);
-		while(TCNT0 < 1)			// delay 12micro
-		{
-			PORTL |= 1 << 6;	// start trigger
-		}
-		PORTL &=~(1 << 6);		// shut trigger	
+		
 		
 		
 		//_delay_ms(100)	;
@@ -333,7 +433,7 @@ int main(void)
 		}
 		PORTL &=~(1 << 6);*/		// shut trigger		
 		/*PORTB = 0xFF;*/
-		_delay_ms(300)	;
+		//_delay_ms(300)	;
 		}
 }
 
